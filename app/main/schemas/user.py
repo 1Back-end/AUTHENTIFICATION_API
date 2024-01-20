@@ -25,7 +25,7 @@ class User(UserBase):
 
 
 class UserDetail(User):
-    pass
+    uuid: str
 
 
 class UserCreate(UserBase):

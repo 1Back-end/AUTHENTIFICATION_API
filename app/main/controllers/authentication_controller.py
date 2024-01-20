@@ -4,7 +4,7 @@ from typing import Any
 from fastapi import APIRouter, Depends, Body, HTTPException
 from sqlalchemy.orm import Session
 
-from app.main.core.dependencies import get_db
+from app.main.core.dependencies import get_db, TokenRequired
 from app.main import schemas, crud, models
 from app.main.core.i18n import __
 from app.main.core.security import create_access_token, check_pass, get_password_hash
@@ -211,3 +211,14 @@ def reset_password(
     db.refresh(user)
 
     return schemas.Msg(message=__("password-reset-successfully"))
+
+
+@router.get("/me", summary="Get current user", response_model=schemas.UserDetail)
+def get_current_user(
+        current_user: models.User = Depends(TokenRequired()),
+        db: Session = Depends(get_db)
+) -> models.User:
+    """
+    Get current user
+    """
+    return current_user

@@ -57,5 +57,9 @@ class CRUDUser(CRUDBase[models.User, schemas.UserCreate, schemas.UserUpdate]):
         cls.resend_otp(db=db, db_obj=db_obj)
         return db_obj
 
+    @classmethod
+    def get_by_uuid(cls, db: Session, *, uuid: str) -> Union[models.User, None]:
+        return db.query(models.User).filter(models.User.uuid == uuid).first()
+
 
 user = CRUDUser(models.User)
