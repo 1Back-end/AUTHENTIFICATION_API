@@ -1,13 +1,15 @@
 import uuid
 from datetime import datetime, timedelta
 from typing import Union
-
+from app.main.core.i18n import __
 from requests import Session
 
 from app.main.crud.base import CRUDBase
+from sqlalchemy.orm import Session
 
 from app.main import schemas, models
-from app.main.core.security import get_password_hash, verify_password
+from app.main.core.security import get_password_hash, verify_password, generate_code
+from app.main import utils
 
 
 class CRUDUser(CRUDBase[models.User, schemas.UserCreate, schemas.UserUpdate]):
@@ -31,7 +33,10 @@ class CRUDUser(CRUDBase[models.User, schemas.UserCreate, schemas.UserUpdate]):
 
     @classmethod
     def resend_otp(cls, db: Session, *, db_obj: models.User) -> models.User:
-        db_obj.otp = "00000"
+        code = generate_code(length=9)[0:5]
+        utils.NexahUtils.send_sms(phonenumber=db_obj.phone_number, body="Le code de validation de votre "
+                                                                        "compte Epura est le suivant :    " + str(code))
+        db_obj.otp = code
         db_obj.otp_expired_at = datetime.now() + timedelta(minutes=5)
         db.commit()
         db.refresh(db_obj)

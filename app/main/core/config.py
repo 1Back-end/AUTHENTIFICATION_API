@@ -24,8 +24,8 @@ class ConfigClass(BaseSettings):
     ACCESS_TOKEN_EXPIRE_MINUTES: int = int(get_secret("ACCESS_TOKEN_EXPIRE_MINUTES", 60 * 24 * 365))
 
     SQLALCHEMY_DATABASE_URL: str = get_secret("SQLALCHEMY_DATABASE_URL",
-                                              'postgresql://postgres:root@localhost:5433'
-                                              '/epursa_users')
+                                              'postgresql://postgres:KmLus48*usT23@localhost:5432'
+                                              '/auth_fastapi')
 
     SQLALCHEMY_POOL_SIZE: int = 100
     SQLALCHEMY_MAX_OVERFLOW: int = 0
@@ -57,10 +57,17 @@ class ConfigClass(BaseSettings):
     REDIS_CHARSET: str = get_secret("REDIS_CHARSET", "UTF-8")
     REDIS_DECODE_RESPONSES: bool = get_secret("REDIS_DECODE_RESPONSES", True)
 
+    SMS_URL: Optional[str] = get_secret("SMS_USER", "https://smsvas.com/bulk/public/index.php/api/v1/sendsms")
+    SMS_USER: Optional[str] = get_secret("SMS_USER", "support@kevmax.com")
+    SMS_PASSWORD: Optional[str] = get_secret("SMS_PASSWORD", "kevmax2021")
+    SMS_SENDER: Optional[str] = get_secret("SMS_SENDER", "Epursa")
+
     LOCAL: bool = os.getenv("LOCAL", True)
 
     class Config:
         case_sensitive = True
+
+    print(f"the db url:{SQLALCHEMY_DATABASE_URL}")
 
 
 Config = ConfigClass()

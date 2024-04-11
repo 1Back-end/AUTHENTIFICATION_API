@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session
 from app.main.core.dependencies import get_db, TokenRequired
 from app.main import schemas, crud, models
 from app.main.core.i18n import __
-from app.main.core.security import create_access_token, check_pass, get_password_hash
+from app.main.core.security import create_access_token, get_password_hash
 from app.main.core.config import Config
 
 router = APIRouter(prefix="", tags=["authentication"])
@@ -18,12 +18,11 @@ async def login_with_phone_number_password(
         phone_number: str = Body(...),
         password: str = Body(...),
         country_code: str = Body(...),
-        db: Session = Depends(get_db)
+        db: Session = Depends(get_db),
 ) -> Any:
     """
     Sign in with phone number and password
     """
-
     user = crud.user.authenticate(
         db, phone_number=f"{country_code}{phone_number}", password=password
     )
@@ -52,12 +51,11 @@ async def login_with_phone_number_password(
 @router.post("/register", summary="Create new user account", response_model=schemas.Msg)
 async def register(
         user: schemas.UserCreate,
-        db: Session = Depends(get_db)
+        db: Session = Depends(get_db),
 ) -> schemas.Msg:
     """
     Create new user account
     """
-
     exist_phone = crud.user.get_by_phone_number(db=db, phone_number=f"{user.country_code}{user.phone_number}")
     if exist_phone:
         raise HTTPException(status_code=409, detail=__("phone_number-already-used"))
@@ -83,13 +81,13 @@ async def register(
 async def resend_otp(
         phone_number: str = Body(...),
         country_code: str = Body(...),
-        db: Session = Depends(get_db)
+        db: Session = Depends(get_db),
 ) -> schemas.Msg:
     """
     Resend OTP
     """
-
     user = crud.user.get_by_phone_number(db=db, phone_number=f"{country_code}{phone_number}")
+    print(f"...........phone number: {user}")
     if not user:
         raise HTTPException(status_code=404, detail=__("user-not-found"))
 
@@ -102,13 +100,13 @@ async def verify_otp(
         phone_number: str = Body(...),
         otp: str = Body(...),
         country_code: str = Body(...),
-        db: Session = Depends(get_db)
+        db: Session = Depends(get_db),
 ) -> Any:
     """
     Validate account with OTP
     """
-
     user = crud.user.get_by_phone_number(db=db, phone_number=f"{country_code}{phone_number}")
+    print(f"...........phone number: {user}")
     if not user:
         raise HTTPException(status_code=404, detail=__("user-not-found"))
 
@@ -141,12 +139,12 @@ async def verify_otp(
 def start_reset_password(
         phone_number: str = Body(...),
         country_code: str = Body(...),
-        db: Session = Depends(get_db)
+        db: Session = Depends(get_db),
+
 ) -> schemas.Msg:
     """
     Start reset password with phone number
     """
-
     user = crud.user.get_by_phone_number(db=db, phone_number=f"{country_code}{phone_number}")
     if not user:
         raise HTTPException(status_code=404, detail=__("user-not-found"))
@@ -163,12 +161,11 @@ def check_otp_password(
         phone_number: str = Body(...),
         otp: str = Body(...),
         country_code: str = Body(...),
-        db: Session = Depends(get_db)
+        db: Session = Depends(get_db),
 ) -> schemas.Msg:
     """
     Check OTP password
     """
-
     user = crud.user.get_by_phone_number(db=db, phone_number=f"{country_code}{phone_number}")
     if not user:
         raise HTTPException(status_code=404, detail=__("user-not-found"))
@@ -188,12 +185,11 @@ def reset_password(
         otp: str = Body(...),
         password: str = Body(...),
         country_code: str = Body(...),
-        db: Session = Depends(get_db)
+        db: Session = Depends(get_db),
 ) -> schemas.Msg:
     """
     Reset password
     """
-
     user = crud.user.get_by_phone_number(db=db, phone_number=f"{country_code}{phone_number}")
     if not user:
         raise HTTPException(status_code=404, detail=__("user-not-found"))
@@ -216,7 +212,7 @@ def reset_password(
 @router.get("/me", summary="Get current user", response_model=schemas.UserDetail)
 def get_current_user(
         current_user: models.User = Depends(TokenRequired()),
-        db: Session = Depends(get_db)
+        db: Session = Depends(get_db),
 ) -> models.User:
     """
     Get current user

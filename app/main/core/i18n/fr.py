@@ -10,5 +10,7 @@ translation = {
     "otp-send-success": "Code de validation envoyé avec succès",
     "reset-password-started": "Votre demande de réinitialisation de mot de passe a été envoyée avec succès !",
     "user-not-activated": "Votre compte n'est pas actif !",
+    "bad-api-key": "La clé d'API que vous avez fournie est invalide",
+    "send-message-text": "Votre code de validation de votre compte Epura est le suivant :\n"
 }
 
