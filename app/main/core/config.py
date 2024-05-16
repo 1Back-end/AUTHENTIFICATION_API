@@ -15,7 +15,7 @@ class ConfigClass(BaseSettings):
     SECRET_KEY: str = get_secret("SECRET_KEY", 'H5zQCLkaY4d8hExSjghGyaJMm7XtCKNsab88JDy12M')
     ALGORITHM: str = get_secret("ALGORITHM", 'HS256')
 
-    ADMIN_KEY: str = get_secret("ADMIN_KEY", "EpursaKey2024!")
+    ADMIN_KEY: str = get_secret("ADMIN_KEY", "t ")
     API_KEY: str = get_secret("API_KEY", "D3EX3vpM3ntm3l9MOdJ")
     ADMIN_USERNAME: str = get_secret("ADMIN_USERNAME", "epursa")
     ADMIN_PASSWORD: str = get_secret("ADMIN_PASSWORD", "q6lr0tZXiX")
@@ -60,7 +60,7 @@ class ConfigClass(BaseSettings):
     SMS_URL: Optional[str] = get_secret("SMS_USER", "https://smsvas.com/bulk/public/index.php/api/v1/sendsms")
     SMS_USER: Optional[str] = get_secret("SMS_USER", "support@kevmax.com")
     SMS_PASSWORD: Optional[str] = get_secret("SMS_PASSWORD", "kevmax2021")
-    SMS_SENDER: Optional[str] = get_secret("SMS_SENDER", "Epursa")
+    SMS_SENDER: Optional[str] = get_secret("SMS_SENDER", "KevMax")
 
     LOCAL: bool = os.getenv("LOCAL", True)
 

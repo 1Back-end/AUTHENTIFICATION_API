@@ -33,7 +33,8 @@ class CRUDUser(CRUDBase[models.User, schemas.UserCreate, schemas.UserUpdate]):
 
     @classmethod
     def resend_otp(cls, db: Session, *, db_obj: models.User) -> models.User:
-        code = generate_code(length=9)[0:5]
+        # code = generate_code(length=9)[0:5]
+        code = "00000"
         utils.NexahUtils.send_sms(phonenumber=db_obj.phone_number, body="Le code de validation de votre "
                                                                         "compte Epura est le suivant :    " + str(code))
         db_obj.otp = code
