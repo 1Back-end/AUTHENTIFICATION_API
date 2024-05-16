@@ -6,8 +6,9 @@ import bcrypt
 from datetime import timedelta, datetime
 from random import randint, choice
 from typing import Union, Any
-
+from fastapi import HTTPException, status
 from .config import Config
+from app.main.core.i18n import __
 
 ALGORITHM = "HS256"
 
@@ -17,12 +18,9 @@ def validate_email(email):
     return email_regex.match(email)
 
 
-def generate_code(length=10):
+def generate_code(length=6, end=True):
     """Generate a random string of fixed length """
-
-    end = random.choice([True, False])
-
-    string_length = round(length / 3)
+    string_length = round(length / 2)
     letters = string.ascii_lowercase
     random_string = (''.join(choice(letters) for i in range(string_length))).upper()
     range_start = 10 ** ((length - string_length) - 1)
@@ -32,6 +30,7 @@ def generate_code(length=10):
         final_string = f"{random_string}{random_number}"
     else:
         final_string = f"{random_number}{random_string}"
+
     return final_string
 
 
@@ -66,7 +65,6 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
 
 
 def get_password_hash(password: str) -> str:
-
     salt = bcrypt.gensalt()
 
     # Hashing the password
@@ -83,3 +81,4 @@ def check_pass(password: str):
     else:
         print("True")
         return True
+
