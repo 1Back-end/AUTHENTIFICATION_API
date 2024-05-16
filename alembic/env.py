@@ -42,8 +42,8 @@ target_metadata = Base.metadata
 
 def get_url():
     return get_secret("SQLALCHEMY_DATABASE_URL",
-                      'postgresql://postgres:KmLus48*usT23@localhost:5432'
-                                              '/auth_fastapi')
+                      'postgresql://postgres:postgres109@localhost:5432'
+                                              '/auth_epursa')
 
 
 def run_migrations_offline():

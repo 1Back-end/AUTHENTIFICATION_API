@@ -82,9 +82,3 @@ def check_pass(password: str):
         print("True")
         return True
 
-
-def is_apikey(api_key: str):
-    if api_key != Config.API_KEY:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail=__("bad-api-key")
-        )

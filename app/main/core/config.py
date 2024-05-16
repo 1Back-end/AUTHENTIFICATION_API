@@ -24,8 +24,8 @@ class ConfigClass(BaseSettings):
     ACCESS_TOKEN_EXPIRE_MINUTES: int = int(get_secret("ACCESS_TOKEN_EXPIRE_MINUTES", 60 * 24 * 365))
 
     SQLALCHEMY_DATABASE_URL: str = get_secret("SQLALCHEMY_DATABASE_URL",
-                                              'postgresql://postgres:KmLus48*usT23@localhost:5432'
-                                              '/auth_fastapi')
+                                              'postgresql://postgres:postgres109@localhost:5432'
+                                              '/auth_epursa')
 
     SQLALCHEMY_POOL_SIZE: int = 100
     SQLALCHEMY_MAX_OVERFLOW: int = 0

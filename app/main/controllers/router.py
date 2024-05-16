@@ -2,7 +2,7 @@ from fastapi import APIRouter
 
 from .authentication_controller import router as authentication
 from .migration_controller import router as migration
-from.utils_controller import router as utils
+from .utils_controller import router as utils
 
 api_router = APIRouter()
 
