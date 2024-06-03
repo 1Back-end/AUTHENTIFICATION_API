@@ -26,10 +26,9 @@ async def validate_token(
     return token
 
 
-@router.get("/get_user/{token}/{uuid}", status_code=200)
+@router.get("/get_user/{token}", status_code=200)
 async def validate_token(
         token: str,
-        uuid: str,
 ):
     """Validate token"""
     db = SessionLocal()
@@ -37,7 +36,7 @@ async def validate_token(
         db.close()
         return False
     db.close()
-    seller = user.get_by_uuid(db=db, uuid=uuid)
+    seller = user.get_by_uuid(db=db, uuid=decode_access_token(token)['sub'])
     if not seller:
         raise HTTPException(status_code=404, detail="User not found")
     return seller
