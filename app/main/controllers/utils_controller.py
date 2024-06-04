@@ -17,6 +17,7 @@ async def validate_token(
 ):
     """Validate token"""
     db = SessionLocal()
+    print(f".............token: {token}")
     if BlacklistToken.check_blacklist(db=db, auth_token=token):
         db.close()
         return False
@@ -26,9 +27,10 @@ async def validate_token(
     return token
 
 
-@router.get("/get_user/{token}", status_code=200)
+@router.get("/get_user/{token}/{user_uuid}", status_code=200)
 async def validate_token(
         token: str,
+        user_uuid: str,
 ):
     """Validate token"""
     db = SessionLocal()
@@ -36,7 +38,7 @@ async def validate_token(
         db.close()
         return False
     db.close()
-    seller = user.get_by_uuid(db=db, uuid=decode_access_token(token)['sub'])
+    seller = user.get_by_uuid(db=db, uuid=user_uuid)
     if not seller:
         raise HTTPException(status_code=404, detail="User not found")
     return seller
