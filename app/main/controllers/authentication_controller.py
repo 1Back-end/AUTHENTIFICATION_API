@@ -1,6 +1,5 @@
 from datetime import timedelta, datetime
-from typing import Any
-
+from typing import Any,Optional
 from fastapi import APIRouter, Depends, Body, HTTPException,UploadFile, File
 from sqlalchemy.orm import Session
 
@@ -223,14 +222,19 @@ def get_current_user(
 
 @router.put("/users/{user_uuid}/profile")
 async def update_user_profile(user_uuid: str, 
-                              first_name: str, 
-                              last_name: str, 
-                              address: str, 
-                              phone_number: str,
-                              avatar: UploadFile = File(...),
-                              db: Session = Depends(get_db)):
+                              first_name: Optional[str] = None, 
+                              last_name: Optional[str] = None, 
+                              address: Optional[str] = None, 
+                              phone_number: Optional[str] = None,
+                              avatar: Optional[UploadFile] = None,
+                              db: Optional[Session] = None):
     try:
-        avatar_file = FileUpload(file_name=avatar.filename, base_64=await avatar.read())
+        if db is None:
+            db = get_db()
+        if avatar is not None:
+            avatar_file = FileUpload(file_name=avatar.filename, base_64=await avatar.read())
+        else:
+            avatar_file = None
         user = UserService.update_profile(db, user_uuid, 
                                           first_name, 
                                           last_name, 
