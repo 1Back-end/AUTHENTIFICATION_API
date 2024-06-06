@@ -79,18 +79,12 @@ class UserService:
         if not user:
             raise Exception("User not found")
         
-        if first_name is not None:
-            user.first_name = first_name
-        if last_name is not None:
-            user.last_name = last_name
-        if email is not None:
-            user.email = email
-        if address is not None:
-            user.address = address
-        if phone_number is not None:
-            user.phone_number = phone_number
-        if birthday is not None:
-            user.birthday = birthday
+        user.first_name = first_name if first_name else user.first_name
+        user.last_name = last_name if last_name else user.last_name
+        user.email = email if email else user.email
+        user.address =  address if address else user.address
+        user.phone_number = phone_number if phone_number else user.phone_number
+        user.birthday = birthday if birthday else user.birthday
         
         if avatar_file:
             file_url = cls.handle_file_upload(avatar_file)
