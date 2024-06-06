@@ -27,7 +27,9 @@ class UserProfileResponse(BaseModel):
     first_name: Optional[str] = None
     last_name: Optional[str] = None
     address: Optional[str] = None
+    email: Optional[str] = None
     phone_number: Optional[str] = None
+    birthday: Optional[str] = None
 
 
 class UserDetail(User):

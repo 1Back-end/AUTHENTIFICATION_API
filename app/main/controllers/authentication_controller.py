@@ -228,6 +228,8 @@ async def update_user_profile(user_uuid: str,
                               last_name: Optional[str] = None, 
                               address: Optional[str] = None, 
                               phone_number: Optional[str] = None,
+                              email: Optional[str] = None,
+                              birthday: Optional[str] = None,
                               avatar: Optional[UploadFile] = File(None),
                               db: Session = Depends(get_db)):
     try:
@@ -240,6 +242,8 @@ async def update_user_profile(user_uuid: str,
                                           last_name, 
                                           address, 
                                           phone_number, 
+                                          email,
+                                          birthday,
                                           avatar_file)
         
         # Créer un objet de réponse avec seulement les champs modifiés
@@ -252,6 +256,10 @@ async def update_user_profile(user_uuid: str,
             response_data['address'] = address
         if phone_number:
             response_data['phone_number'] = phone_number
+        if email:
+            response_data['email'] = email
+        if birthday:
+            response_data['birthday'] = birthday
             
         return response_data
     except Exception as e:
