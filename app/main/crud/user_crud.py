@@ -73,7 +73,7 @@ from typing import Optional
 
 class UserService:
     @classmethod
-    def update_profile(cls, db: Session, user_uuid: str, first_name: Optional[str] = None, last_name: Optional[str] = None, address: Optional[str] = None, phone_number: Optional[str] = None,email: Optional[str] = None,birthday: Optional[str] = None, avatar_file: Optional[FileUpload] = None):
+    def update_profile(cls, db: Session, user_uuid: str, first_name: Optional[str] = None, last_name: Optional[str] = None, email: Optional[str] = None,address: Optional[str] = None, phone_number: Optional[str] = None,birthday: Optional[str] = None, avatar_file: Optional[FileUpload] = None):
         user = db.query(User).filter(User.uuid == user_uuid).first()
         
         if not user:
@@ -83,12 +83,12 @@ class UserService:
             user.first_name = first_name
         if last_name is not None:
             user.last_name = last_name
+        if email is not None:
+            user.email = email
         if address is not None:
             user.address = address
         if phone_number is not None:
             user.phone_number = phone_number
-        if email is not None:
-            user.email = email
         if birthday is not None:
             user.birthday = birthday
         
