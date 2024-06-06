@@ -227,10 +227,8 @@ async def update_user_profile(user_uuid: str,
                               address: Optional[str] = None, 
                               phone_number: Optional[str] = None,
                               avatar: Optional[UploadFile] = None,
-                              db: Optional[Session] = None):
+                              db: Session = Depends(get_db)):
     try:
-        if db is None:
-            db = get_db()
         if avatar is not None:
             avatar_file = FileUpload(file_name=avatar.filename, base_64=await avatar.read())
         else:
