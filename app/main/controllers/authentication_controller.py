@@ -236,14 +236,16 @@ async def update_user_profile(user_uuid: str,
             avatar_file = FileUpload(file_name=avatar.filename, base_64=await avatar.read())
         else:
             avatar_file = None
-        user = crud.user.update_profile(db, user_uuid, 
-                                          first_name, 
-                                          last_name, 
-                                          email, 
-                                          address,
-                                          phone_number, 
-                                          birthday,
-                                          avatar_file)
+        user = crud.user.update_profile(
+            db = db,
+            user_uuid=user_uuid,
+            first_name=first_name,
+            last_name=last_name,
+            email=email,                                                      
+            address=address,
+            phone_number=phone_number, 
+            birthday=birthday,         
+            avatar_file=avatar_file)
        
             
         return user
