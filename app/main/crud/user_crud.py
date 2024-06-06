@@ -69,21 +69,28 @@ class CRUDUser(CRUDBase[models.User, schemas.UserCreate, schemas.UserUpdate]):
         return db.query(models.User).filter(models.User.uuid == uuid).first()
 
 
+from typing import Optional
+
 class UserService:
     @classmethod
-    def update_profile(cls, db: Session, user_uuid: str, first_name: str, last_name: str, address: str, phone_number: str, avatar_file: FileUpload):
+    def update_profile(cls, db: Session, user_uuid: str, first_name: Optional[str] = None, last_name: Optional[str] = None, address: Optional[str] = None, phone_number: Optional[str] = None, avatar_file: Optional[FileUpload] = None):
         user = db.query(User).filter(User.uuid == user_uuid).first()
         
         if not user:
             raise Exception("User not found")
         
-        user.first_name = first_name
-        user.last_name = last_name
-        user.address = address
-        user.phone_number = phone_number
+        if first_name is not None:
+            user.first_name = first_name
+        if last_name is not None:
+            user.last_name = last_name
+        if address is not None:
+            user.address = address
+        if phone_number is not None:
+            user.phone_number = phone_number
         
-        file_url = cls.handle_file_upload(avatar_file)
-        user.avatar.url = file_url
+        if avatar_file:
+            file_url = cls.handle_file_upload(avatar_file)
+            user.avatar.url = file_url
         
         db.commit()
         db.refresh(user)
@@ -91,8 +98,9 @@ class UserService:
         
     @staticmethod
     def handle_file_upload(file: FileUpload) -> str:
-       
+    
         pass
+
         
 
 user = CRUDUser(models.User)
