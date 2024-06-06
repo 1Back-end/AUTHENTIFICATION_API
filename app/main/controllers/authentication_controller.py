@@ -1,7 +1,7 @@
 from datetime import timedelta, datetime
 from typing import Any
 
-from fastapi import APIRouter, Depends, Body, HTTPException
+from fastapi import APIRouter, Depends, Body, HTTPException,UploadFile, File
 from sqlalchemy.orm import Session
 
 from app.main.core.dependencies import get_db, TokenRequired
@@ -9,7 +9,9 @@ from app.main import schemas, crud, models
 from app.main.core.i18n import __
 from app.main.core.security import create_access_token, get_password_hash
 from app.main.core.config import Config
-
+from app.main.models import User
+from app.main.crud.user_crud import UserService
+from app.main.schemas.file import FileUpload
 router = APIRouter(prefix="", tags=["authentication"])
 
 
@@ -218,3 +220,23 @@ def get_current_user(
     Get current user
     """
     return current_user
+
+@router.put("/users/{user_uuid}/profile")
+async def update_user_profile(user_uuid: str, 
+                              first_name: str, 
+                              last_name: str, 
+                              address: str, 
+                              phone_number: str,
+                              avatar: UploadFile = File(...),
+                              db: Session = Depends(get_db)):
+    try:
+        avatar_file = FileUpload(file_name=avatar.filename, base_64=await avatar.read())
+        user = UserService.update_profile(db, user_uuid, 
+                                          first_name, 
+                                          last_name, 
+                                          address, 
+                                          phone_number, 
+                                          avatar_file)
+        return user
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))

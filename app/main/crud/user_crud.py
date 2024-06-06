@@ -1,12 +1,13 @@
 import uuid
 from datetime import datetime, timedelta
-from typing import Union
+from typing import Union,Optional
 from app.main.core.i18n import __
 from requests import Session
-
+from app.main.schemas.file import FileUpload
 from app.main.crud.base import CRUDBase
 from sqlalchemy.orm import Session
-
+from app.main.models import User
+from app.main.schemas.file import FileUpload
 from app.main import schemas, models
 from app.main.core.security import get_password_hash, verify_password, generate_code
 from app.main import utils
@@ -67,5 +68,31 @@ class CRUDUser(CRUDBase[models.User, schemas.UserCreate, schemas.UserUpdate]):
     def get_by_uuid(cls, db: Session, *, uuid: str) -> Union[models.User, None]:
         return db.query(models.User).filter(models.User.uuid == uuid).first()
 
+
+class UserService:
+    @classmethod
+    def update_profile(cls, db: Session, user_uuid: str, first_name: str, last_name: str, address: str, phone_number: str, avatar_file: FileUpload):
+        user = db.query(User).filter(User.uuid == user_uuid).first()
+        
+        if not user:
+            raise Exception("User not found")
+        
+        user.first_name = first_name
+        user.last_name = last_name
+        user.address = address
+        user.phone_number = phone_number
+        
+        file_url = cls.handle_file_upload(avatar_file)
+        user.avatar.url = file_url
+        
+        db.commit()
+        db.refresh(user)
+        return user
+        
+    @staticmethod
+    def handle_file_upload(file: FileUpload) -> str:
+        # Implémentez votre logique pour gérer l'upload du fichier
+        pass
+        
 
 user = CRUDUser(models.User)
