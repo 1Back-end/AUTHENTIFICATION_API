@@ -79,7 +79,7 @@ class CRUDUser(CRUDBase[models.User, schemas.UserCreate, schemas.UserUpdate]):
         user.address =  address if address else user.address
         user.phone_number = phone_number if phone_number else user.phone_number
         user.birthday = birthday if birthday else user.birthday
-        
+        user.full_phone_number=user.country_code + phone_number if phone_number else user.phone_number
         if avatar_file:
             file_url = cls.handle_file_upload(avatar_file)
             user.avatar.url = file_url

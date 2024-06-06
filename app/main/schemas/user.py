@@ -30,7 +30,7 @@ class UserProfileResponse(BaseModel):
     email: Optional[str] = None
     phone_number: Optional[str] = None
     birthday: datetime = None
-
+    full_phone_number:Optional[str] = None
 
 class UserDetail(User):
     uuid: str
