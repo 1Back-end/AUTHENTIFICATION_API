@@ -11,6 +11,7 @@ from app.main.core.config import Config
 from app.main.models import User
 from app.main.crud.user_crud import UserService
 from app.main.schemas.file import FileUpload
+from app.main.schemas.user import UserProfileResponse
 router = APIRouter(prefix="", tags=["authentication"])
 
 
@@ -220,16 +221,17 @@ def get_current_user(
     """
     return current_user
 
-@router.put("/users/{user_uuid}/profile")
+
+@router.put("/users/{user_uuid}/profile", response_model=UserProfileResponse)
 async def update_user_profile(user_uuid: str, 
                               first_name: Optional[str] = None, 
                               last_name: Optional[str] = None, 
                               address: Optional[str] = None, 
                               phone_number: Optional[str] = None,
-                              avatar: Optional[UploadFile] = None,
+                              avatar: Optional[UploadFile] = File(None),
                               db: Session = Depends(get_db)):
     try:
-        if avatar is not None:
+        if avatar is not None and avatar.filename:
             avatar_file = FileUpload(file_name=avatar.filename, base_64=await avatar.read())
         else:
             avatar_file = None
@@ -239,6 +241,18 @@ async def update_user_profile(user_uuid: str,
                                           address, 
                                           phone_number, 
                                           avatar_file)
-        return user
+        
+        # Créer un objet de réponse avec seulement les champs modifiés
+        response_data = {}
+        if first_name:
+            response_data['first_name'] = first_name
+        if last_name:
+            response_data['last_name'] = last_name
+        if address:
+            response_data['address'] = address
+        if phone_number:
+            response_data['phone_number'] = phone_number
+            
+        return response_data
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))

@@ -23,6 +23,12 @@ class User(UserBase):
     date_added: datetime
     date_modified: datetime
 
+class UserProfileResponse(BaseModel):
+    first_name: Optional[str] = None
+    last_name: Optional[str] = None
+    address: Optional[str] = None
+    phone_number: Optional[str] = None
+
 
 class UserDetail(User):
     uuid: str
