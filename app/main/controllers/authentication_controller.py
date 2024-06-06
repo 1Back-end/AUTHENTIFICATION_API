@@ -9,7 +9,6 @@ from app.main.core.i18n import __
 from app.main.core.security import create_access_token, get_password_hash
 from app.main.core.config import Config
 from app.main.models import User
-from app.main.crud.user_crud import UserService
 from app.main.schemas.file import FileUpload
 from app.main.schemas.user import UserProfileResponse
 router = APIRouter(prefix="", tags=["authentication"])
@@ -237,7 +236,7 @@ async def update_user_profile(user_uuid: str,
             avatar_file = FileUpload(file_name=avatar.filename, base_64=await avatar.read())
         else:
             avatar_file = None
-        user = UserService.update_profile(db, user_uuid, 
+        user = crud.user.update_profile(db, user_uuid, 
                                           first_name, 
                                           last_name, 
                                           email, 
@@ -245,22 +244,8 @@ async def update_user_profile(user_uuid: str,
                                           phone_number, 
                                           birthday,
                                           avatar_file)
-        
-        # Créer un objet de réponse avec seulement les champs modifiés
-        response_data = {}
-        if first_name:
-            response_data['first_name'] = first_name
-        if last_name:
-            response_data['last_name'] = last_name
-        if email:
-            response_data['email'] = email
-        if address:
-            response_data['address'] = address
-        if phone_number:
-            response_data['phone_number'] = phone_number
-        if birthday:
-            response_data['birthday'] = birthday
+       
             
-        return response_data
+        return user
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))

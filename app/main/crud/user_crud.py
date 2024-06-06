@@ -69,15 +69,9 @@ class CRUDUser(CRUDBase[models.User, schemas.UserCreate, schemas.UserUpdate]):
         return db.query(models.User).filter(models.User.uuid == uuid).first()
 
 
-from typing import Optional
-
-class UserService:
     @classmethod
     def update_profile(cls, db: Session, user_uuid: str, first_name: Optional[str] = None, last_name: Optional[str] = None, email: Optional[str] = None,address: Optional[str] = None, phone_number: Optional[str] = None,birthday: Optional[str] = None, avatar_file: Optional[FileUpload] = None):
         user = db.query(User).filter(User.uuid == user_uuid).first()
-        
-        if not user:
-            raise Exception("User not found")
         
         user.first_name = first_name if first_name else user.first_name
         user.last_name = last_name if last_name else user.last_name
