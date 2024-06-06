@@ -91,7 +91,7 @@ class UserService:
         
     @staticmethod
     def handle_file_upload(file: FileUpload) -> str:
-        # Implémentez votre logique pour gérer l'upload du fichier
+       
         pass
         
 
