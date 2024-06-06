@@ -225,11 +225,11 @@ def get_current_user(
 @router.put("/users/{user_uuid}/profile", response_model=UserProfileResponse)
 async def update_user_profile(user_uuid: str, 
                               first_name: Optional[str] = None, 
-                              last_name: Optional[str] = None, 
+                              last_name: Optional[str] = None,
+                              email: Optional[str] = None,  
                               address: Optional[str] = None, 
                               phone_number: Optional[str] = None,
-                              email: Optional[str] = None,
-                              birthday: Optional[str] = None,
+                              birthday: Optional[str] = None, 
                               avatar: Optional[UploadFile] = File(None),
                               db: Session = Depends(get_db)):
     try:
@@ -237,30 +237,29 @@ async def update_user_profile(user_uuid: str,
             avatar_file = FileUpload(file_name=avatar.filename, base_64=await avatar.read())
         else:
             avatar_file = None
+
+        # Mettre à jour le profil de l'utilisateur
         user = UserService.update_profile(db, user_uuid, 
                                           first_name, 
                                           last_name, 
+                                          email,
                                           address, 
                                           phone_number, 
-                                          email,
                                           birthday,
                                           avatar_file)
         
-        # Créer un objet de réponse avec seulement les champs modifiés
-        response_data = {}
-        if first_name:
-            response_data['first_name'] = first_name
-        if last_name:
-            response_data['last_name'] = last_name
-        if address:
-            response_data['address'] = address
-        if phone_number:
-            response_data['phone_number'] = phone_number
-        if email:
-            response_data['email'] = email
-        if birthday:
-            response_data['birthday'] = birthday
+        # Préparer les données de réponse
+        response_data = {
+            "user_uuid": user_uuid,
+            "first_name": user.first_name,
+            "last_name": user.last_name,
+            "email": user.email,
+            "address": user.address,
+            "phone_number": user.phone_number,
+            "birthday": user.birthday
             
+        }
+
         return response_data
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
