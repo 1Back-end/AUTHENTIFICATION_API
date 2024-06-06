@@ -29,7 +29,7 @@ class UserProfileResponse(BaseModel):
     address: Optional[str] = None
     email: Optional[str] = None
     phone_number: Optional[str] = None
-    birthday: Optional[datetime] = None
+    birthday: datetime = None
 
 
 class UserDetail(User):
