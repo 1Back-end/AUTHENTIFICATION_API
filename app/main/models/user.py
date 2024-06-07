@@ -1,9 +1,8 @@
 from dataclasses import dataclass
 from enum import Enum
-
-from sqlalchemy import Column, String, types, DateTime, event
+from sqlalchemy import Column, ForeignKey, Integer, String, DateTime, Text, Table, Boolean,types,event
 from datetime import datetime, date
-
+from sqlalchemy.orm import relationship
 from .db.base_class import Base
 
 
@@ -34,6 +33,11 @@ class User(Base):
 
     otp: str = Column(String(5), nullable=True, default="")
     otp_expired_at: datetime = Column(DateTime, nullable=True, default=None)
+
+    avatar_uuid = Column(String(255), ForeignKey('storages.uuid', ondelete="CASCADE"), nullable=True)
+    avatar = relationship("Storage", foreign_keys=[avatar_uuid],uselist=False, backref="user")
+
+
 
     otp_password: str = Column(String(5), nullable=True, default="")
     otp_password_expired_at: datetime = Column(DateTime, nullable=True, default=None)
