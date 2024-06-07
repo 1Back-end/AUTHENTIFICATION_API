@@ -1,3 +1,4 @@
+import uuid
 from datetime import timedelta, datetime
 from typing import Any,Optional
 from fastapi import APIRouter, Depends, Body, HTTPException,UploadFile, File
@@ -134,6 +135,34 @@ async def verify_otp(
             "token_type": "bearer",
         }
     }
+
+@router.post("/logout")
+def logout_user(
+    *,
+    db:Session= Depends(get_db),
+    current_user: models.User = Depends(TokenRequired()),
+    request:Request
+) -> Any:
+    """
+        Logout a user
+    """
+
+
+    user_token = (request.headers["authorization"]).split("Bearer")[1].strip()
+
+    new_blacklist_token = models.BlacklistToken(
+        uuid = str(uuid.uuid4()),
+        token = str(user_token),
+    )
+    db.add(new_blacklist_token)
+    db.commit()
+    print("=====blacklist token====",type(new_blacklist_token.date_added),type(new_blacklist_token.date_modified))
+    db.refresh(new_blacklist_token)
+
+
+    print("======current_user======",user_token)
+    return {'message': 'You have logged out successfully!'}
+
 
 
 @router.post("/start-reset-password", summary="Start reset password with phone number", response_model=schemas.Msg)
