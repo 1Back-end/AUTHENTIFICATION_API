@@ -34,8 +34,8 @@ class User(Base):
     otp: str = Column(String(5), nullable=True, default="")
     otp_expired_at: datetime = Column(DateTime, nullable=True, default=None)
 
-    avatar_uuid = Column(String(255), ForeignKey('storages.uuid', ondelete="CASCADE"), nullable=True)
-    avatar = relationship("Storage", foreign_keys=[avatar_uuid],uselist=False, backref="user")
+    # avatar_uuid = Column(String(255), ForeignKey('storages.uuid', ondelete="CASCADE"), nullable=True)
+    # avatar = relationship("Storage", foreign_keys=[avatar_uuid],uselist=False, backref="user")
 
 
 

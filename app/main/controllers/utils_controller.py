@@ -42,3 +42,19 @@ async def validate_token(
     if not seller:
         raise HTTPException(status_code=404, detail="User not found")
     return seller
+
+@router.get("/get_buyer_uuid/{token}/{phone_number}", status_code=200)
+async def validate_token(
+        token: str,
+        phone_number: str,
+):
+    """Validate token"""
+    db = SessionLocal()
+    if BlacklistToken.check_blacklist(db=db, auth_token=token):
+        db.close()
+        return False
+    db.close()
+    buyer_uuid = user.get_by_phone_number(db=db, phone_number=phone_number)
+    if not buyer_uuid:
+        raise HTTPException(status_code=404, detail="User not found")
+    return buyer_uuid.uuid

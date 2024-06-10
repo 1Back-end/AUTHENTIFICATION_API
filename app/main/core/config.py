@@ -15,7 +15,7 @@ class ConfigClass(BaseSettings):
     SECRET_KEY: str = get_secret("SECRET_KEY", 'H5zQCLkaY4d8hExSjghGyaJMm7XtCKNsab88JDy12M')
     ALGORITHM: str = get_secret("ALGORITHM", 'HS256')
 
-    ADMIN_KEY: str = get_secret("ADMIN_KEY", "t ")
+    ADMIN_KEY: str = get_secret("ADMIN_KEY", "EpursaKey2024")
     API_KEY: str = get_secret("API_KEY", "D3EX3vpM3ntm3l9MOdJ")
     ADMIN_USERNAME: str = get_secret("ADMIN_USERNAME", "epursa")
     ADMIN_PASSWORD: str = get_secret("ADMIN_PASSWORD", "q6lr0tZXiX")
@@ -24,8 +24,8 @@ class ConfigClass(BaseSettings):
     ACCESS_TOKEN_EXPIRE_MINUTES: int = int(get_secret("ACCESS_TOKEN_EXPIRE_MINUTES", 60 * 24 * 365))
 
     SQLALCHEMY_DATABASE_URL: str = get_secret("SQLALCHEMY_DATABASE_URL",
-                                              'postgresql://postgres:postgres@192.168.1.59:5432'
-                                              '/epursa_authentication')
+                                              'postgresql://postgres:postgres19J2140@localhost:5432'
+                                              '/auth_epursa')
 
     SQLALCHEMY_POOL_SIZE: int = 100
     SQLALCHEMY_MAX_OVERFLOW: int = 0

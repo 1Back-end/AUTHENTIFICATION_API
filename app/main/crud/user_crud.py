@@ -3,11 +3,9 @@ from datetime import datetime, timedelta
 from typing import Union,Optional
 from app.main.core.i18n import __
 from requests import Session
-from app.main.schemas.file import FileUpload
 from app.main.crud.base import CRUDBase
 from sqlalchemy.orm import Session
 from app.main.models import User
-from app.main.schemas.file import FileUpload
 from app.main import schemas, models
 from app.main.core.security import get_password_hash, verify_password, generate_code
 from app.main import utils
@@ -70,7 +68,7 @@ class CRUDUser(CRUDBase[models.User, schemas.UserCreate, schemas.UserUpdate]):
 
 
     @classmethod
-    def update_profile(cls, db: Session, user_uuid: str, first_name: Optional[str] = None, last_name: Optional[str] = None, email: Optional[str] = None,address: Optional[str] = None, phone_number: Optional[str] = None,birthday: Optional[str] = None, avatar_file: Optional[FileUpload] = None):
+    def update_profile(cls, db: Session, user_uuid: str, first_name: Optional[str] = None, last_name: Optional[str] = None, email: Optional[str] = None,address: Optional[str] = None, phone_number: Optional[str] = None,birthday: Optional[str] = None):
         user = db.query(User).filter(User.uuid == user_uuid).first()
         
         user.first_name = first_name if first_name else user.first_name
@@ -80,18 +78,18 @@ class CRUDUser(CRUDBase[models.User, schemas.UserCreate, schemas.UserUpdate]):
         user.phone_number = phone_number if phone_number else user.phone_number
         user.birthday = birthday if birthday else user.birthday
         user.full_phone_number=user.country_code + phone_number if phone_number else user.phone_number
-        if avatar_file:
-            file_url = cls.handle_file_upload(avatar_file)
-            user.avatar.url = file_url
+        # if avatar_file:
+        #     file_url = cls.handle_file_upload(avatar_file)
+        #     user.avatar.url = file_url
         
         db.commit()
         db.refresh(user)
         return user
         
-    @staticmethod
-    def handle_file_upload(file: FileUpload) -> str:
-    
-        pass
+    # @staticmethod
+    # def handle_file_upload(file: FileUpload) -> str:
+    #
+    #     pass
 
         
 
