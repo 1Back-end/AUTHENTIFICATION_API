@@ -23,12 +23,10 @@ class ConfigClass(BaseSettings):
     # 60 minutes * 24 hours * 355 days = 365 days
     ACCESS_TOKEN_EXPIRE_MINUTES: int = int(get_secret("ACCESS_TOKEN_EXPIRE_MINUTES", 60 * 24 * 365))
 
-    # SQLALCHEMY_DATABASE_URL: str = get_secret("SQLALCHEMY_DATABASE_URL",
-    #                                           'postgresql://postgres:postgres19J2140@localhost:5432'
-    #                                           '/auth_epursa')
     SQLALCHEMY_DATABASE_URL: str = get_secret("SQLALCHEMY_DATABASE_URL",
-                                              'postgresql://postgres:root@localhost:5433'
-                                              '/epursa_users')
+                                              'postgresql://postgres:postgres19J2140@localhost:5432'
+                                              '/auth_epursa')
+
 
     SQLALCHEMY_POOL_SIZE: int = 100
     SQLALCHEMY_MAX_OVERFLOW: int = 0
