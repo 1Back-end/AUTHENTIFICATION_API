@@ -11,7 +11,7 @@ from app.main.schemas.file import FileUpload
 from app.main import schemas, models
 from app.main.core.security import get_password_hash, verify_password, generate_code
 from app.main import utils
-
+from fastapi import HTTPException
 
 class CRUDUser(CRUDBase[models.User, schemas.UserCreate, schemas.UserUpdate]):
 
@@ -46,23 +46,27 @@ class CRUDUser(CRUDBase[models.User, schemas.UserCreate, schemas.UserUpdate]):
 
     @classmethod
     def create(cls, db: Session, *, obj_in: schemas.UserCreate) -> models.User:
-        db_obj = models.User(
-            uuid=str(uuid.uuid4()),
-            full_phone_number=f"{obj_in.country_code}{obj_in.phone_number}",
-            country_code=obj_in.country_code,
-            phone_number=obj_in.phone_number,
-            email=obj_in.email,
-            password_hash=get_password_hash(obj_in.password),
-            first_name=obj_in.first_name,
-            last_name=obj_in.last_name,
-            status=models.UserStatusType.UNACTIVED,
-            birthday=obj_in.birthday if obj_in.birthday else None,
-            address=obj_in.address if obj_in.address else None,
-        )
-        db.add(db_obj)
-        db.commit()
-        cls.resend_otp(db=db, db_obj=db_obj)
-        return db_obj
+        if len(obj_in.country_code) > 5:
+            raise HTTPException(status_code=400, detail="Country code cannot be longer than 5 characters")
+        else:
+            db_obj = models.User(
+                uuid=str(uuid.uuid4()),
+                full_phone_number=f"{obj_in.country_code}{obj_in.phone_number}",
+                country_code=obj_in.country_code,
+                phone_number=obj_in.phone_number,
+                email=obj_in.email,
+                password_hash=get_password_hash(obj_in.password),
+                first_name=obj_in.first_name,
+                last_name=obj_in.last_name,
+                status=models.UserStatusType.UNACTIVED,
+                birthday=obj_in.birthday if obj_in.birthday else None,
+                address=obj_in.address if obj_in.address else None,
+            )
+            db.add(db_obj)
+            db.commit()
+            cls.resend_otp(db=db, db_obj=db_obj)
+            return db_obj
+       
 
     @classmethod
     def get_by_uuid(cls, db: Session, *, uuid: str) -> Union[models.User, None]:
