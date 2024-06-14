@@ -1,7 +1,7 @@
 import uuid
 from datetime import timedelta, datetime
-from typing import Any, Optional
-from fastapi import APIRouter, Depends, Body, HTTPException, UploadFile, File
+from typing import Any, Optional, List
+from fastapi import APIRouter, Depends, Body, HTTPException, Query, File
 from sqlalchemy.orm import Session
 import requests
 from starlette.requests import Request
@@ -259,7 +259,7 @@ async def update_user_profile(user_uuid: str,
                               address: Optional[str] = None,
                               phone_number: Optional[str] = None,
                               birthday: Optional[str] = None,
-                              storage_uuid: Optional[str] =None,
+                              storage_uuid: str = None,
                               db: Session = Depends(get_db)):
     try:
         
@@ -277,6 +277,7 @@ async def update_user_profile(user_uuid: str,
             address=address,
             phone_number=phone_number,
             birthday=birthday,
+            storage_uuid=storage_uuid
             # avatar_file=avatar_file
         )
 

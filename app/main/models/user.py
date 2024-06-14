@@ -30,6 +30,7 @@ class User(Base):
     email: str = Column(String(100), nullable=False, default="", index=True)
     address: str = Column(String(100), nullable=False, default="")
     birthday: date = Column(DateTime, nullable=True, default=None)
+    storage_uuid: str = Column(String(100), nullable=True)
 
     otp: str = Column(String(5), nullable=True, default="")
     otp_expired_at: datetime = Column(DateTime, nullable=True, default=None)
