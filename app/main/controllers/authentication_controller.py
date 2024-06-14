@@ -1,7 +1,10 @@
+import uuid
 from datetime import timedelta, datetime
-from typing import Any,Optional
-from fastapi import APIRouter, Depends, Body, HTTPException,UploadFile, File
+from typing import Any, Optional
+from fastapi import APIRouter, Depends, Body, HTTPException, UploadFile, File
 from sqlalchemy.orm import Session
+import requests
+from starlette.requests import Request
 
 from app.main.core.dependencies import get_db, TokenRequired
 from app.main import schemas, crud, models
@@ -9,8 +12,8 @@ from app.main.core.i18n import __
 from app.main.core.security import create_access_token, get_password_hash
 from app.main.core.config import Config
 from app.main.models import User
-from app.main.schemas.file import FileUpload
 from app.main.schemas.user import UserProfileResponse
+
 router = APIRouter(prefix="", tags=["authentication"])
 
 
@@ -65,7 +68,7 @@ async def register(
     if exist_email:
         raise HTTPException(status_code=409, detail=__("email-already-used"))
 
-    correct_password = True # check_pass(password=user.password)
+    correct_password = True  # check_pass(password=user.password)
     if not correct_password:
         raise HTTPException(
             status_code=400,
@@ -136,6 +139,32 @@ async def verify_otp(
     }
 
 
+@router.post("/logout")
+def logout_user(
+        *,
+        db: Session = Depends(get_db),
+        current_user: models.User = Depends(TokenRequired()),
+        request: Request
+) -> Any:
+    """
+        Logout a user
+    """
+
+    user_token = (request.headers["authorization"]).split("Bearer")[1].strip()
+
+    new_blacklist_token = models.BlacklistToken(
+        uuid=str(uuid.uuid4()),
+        token=str(user_token),
+    )
+    db.add(new_blacklist_token)
+    db.commit()
+    print("=====blacklist token====", type(new_blacklist_token.date_added), type(new_blacklist_token.date_modified))
+    db.refresh(new_blacklist_token)
+
+    print("======current_user======", user_token)
+    return {'message': 'You have logged out successfully!'}
+
+
 @router.post("/start-reset-password", summary="Start reset password with phone number", response_model=schemas.Msg)
 def start_reset_password(
         phone_number: str = Body(...),
@@ -156,6 +185,7 @@ def start_reset_password(
     db.refresh(user)
 
     return schemas.Msg(message=__("reset-password-started"))
+
 
 @router.post("/check-otp-password", summary="Check OTP password", response_model=schemas.Msg)
 def check_otp_password(
@@ -222,32 +252,32 @@ def get_current_user(
 
 
 @router.put("/users/{user_uuid}/profile", response_model=UserProfileResponse)
-async def update_user_profile(user_uuid: str, 
-                              first_name: Optional[str] = None, 
+async def update_user_profile(user_uuid: str,
+                              first_name: Optional[str] = None,
                               last_name: Optional[str] = None,
                               email: Optional[str] = None,
-                              address: Optional[str] = None, 
+                              address: Optional[str] = None,
                               phone_number: Optional[str] = None,
                               birthday: Optional[str] = None,
-                              avatar: Optional[UploadFile] = File(None),
+                              # avatar: Optional[UploadFile] = File(None),
                               db: Session = Depends(get_db)):
     try:
-        if avatar is not None and avatar.filename:
-            avatar_file = FileUpload(file_name=avatar.filename, base_64=await avatar.read())
-        else:
-            avatar_file = None
+        # if avatar is not None and avatar.filename:
+        #     avatar_file = FileUpload(file_name=avatar.filename, base_64=await avatar.read())
+        # else:
+        #     avatar_file = None
         user = crud.user.update_profile(
-            db = db,
+            db=db,
             user_uuid=user_uuid,
             first_name=first_name,
             last_name=last_name,
-            email=email,                                                      
+            email=email,
             address=address,
-            phone_number=phone_number, 
-            birthday=birthday,         
-            avatar_file=avatar_file)
-       
-            
+            phone_number=phone_number,
+            birthday=birthday,
+            # avatar_file=avatar_file
+        )
+
         return user
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
