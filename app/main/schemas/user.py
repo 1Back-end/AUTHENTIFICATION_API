@@ -1,7 +1,6 @@
 from datetime import datetime, date
-from typing import List, Optional
-
-from pydantic import BaseModel, ConfigDict
+from typing import List, Optional, Any
+from pydantic import BaseModel, ConfigDict,Json
 
 from app.main.schemas import DataList
 
@@ -28,24 +27,26 @@ class Storage(BaseModel):
     uuid: Optional[str] = None
     file_name: Optional[str] = None
     url: Optional[str] = None
-    mimetype: Optional[int] = None
+    mimetype: Optional[str] = None
     width: Optional[int] = None
     height: Optional[int] = None
     size: Optional[int] = None
-    #thumbnail: Optional[FileResize] = None
-    # medium: Optional[FileResize] = None
+    thumbnail: Any
+    medium: Any
     date_added: Optional[datetime] = None
     date_modified: Optional[datetime] = None
 
 
 class UserProfileResponse(BaseModel):
     user: User
-    storage: Optional[Storage] = None
+    avatar: Optional[Storage]
 
 
 
 class UserDetail(User):
     uuid: str
+    avatar: Optional[Storage] = None
+
 
 
 class UserCreate(UserBase):

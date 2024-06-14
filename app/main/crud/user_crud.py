@@ -1,6 +1,6 @@
 import uuid
 from datetime import datetime, timedelta
-from typing import Union,Optional
+from typing import Union,Optional,List
 from app.main.core.i18n import __
 from requests import Session
 from app.main.crud.base import CRUDBase
@@ -73,30 +73,45 @@ class CRUDUser(CRUDBase[models.User, schemas.UserCreate, schemas.UserUpdate]):
 
 
     @classmethod
-    def update_profile(cls, db: Session, user_uuid: str, first_name: Optional[str] = None, last_name: Optional[str] = None, email: Optional[str] = None,address: Optional[str] = None, phone_number: Optional[str] = None,birthday: Optional[str] = None
-                       ,storage_uuid: Optional[str] = None):
+    def update_profile(
+            cls,
+            db: Session,
+            user_uuid: str,
+            country_code: str = None,
+            first_name: Optional[str] = None,
+            last_name: Optional[str] = None,
+            email: Optional[str] = None,
+            address: Optional[str] = None,
+            phone_number: Optional[str] = None,
+            birthday: Optional[str] = None,
+            storage_uuid: str = None,
+    ):
+        exist_storage = None
+
         user = db.query(User).filter(User.uuid == user_uuid).first()
+
         user.first_name = first_name if first_name else user.first_name
         user.last_name = last_name if last_name else user.last_name
         user.email = email if email else user.email
+
+        user.country = country_code if country_code else user.country_code
         user.address =  address if address else user.address
         user.phone_number = phone_number if phone_number else user.phone_number
+
         user.birthday = birthday if birthday else user.birthday
-        user.full_phone_number=user.country_code + phone_number if phone_number else user.phone_number
+        user.full_phone_number=user.country_code + phone_number if phone_number else user.full_phone_number
+        user.storage_uuid = None
 
-        if storage_uuid:
-            list_storage_uuid = [storage_uuid]
+        if storage_uuid is not None:
+            storage_uuids =[storage_uuid]
+            exist_storage = storage.get_storages(storage_uuids=storage_uuids)
+            exist_storage = exist_storage[0]
 
-            exist_storage = storage.get_storages(storage_uuid=list_storage_uuid)
-            user.storage_uuid = exist_storage[0].uuid if exist_storage else user.storage_uuid
-
-        # if avatar_file:
-        #     file_url = cls.handle_file_upload(avatar_file)
-        #     user.avatar.url = file_url
-        
+            print("===exist_storage123===",exist_storage)
+            user.storage_uuid = exist_storage["uuid"] if exist_storage else user.storage_uuid
         db.commit()
         db.refresh(user)
-        return {"user" : user , "storage" : exist_storage} 
+        return {"user" : user ,"avatar":exist_storage}
         
     # @staticmethod
     # def handle_file_upload(file: FileUpload) -> str:
