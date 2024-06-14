@@ -19,6 +19,7 @@ class UserBase(BaseModel):
 
 
 class User(UserBase):
+    uuid: Optional[str] = None
     date_added: datetime
     date_modified: datetime
 
