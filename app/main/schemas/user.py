@@ -23,14 +23,26 @@ class User(UserBase):
     date_added: datetime
     date_modified: datetime
 
+
+class Storage(BaseModel):
+    uuid: Optional[str] = None
+    file_name: Optional[str] = None
+    url: Optional[str] = None
+    mimetype: Optional[int] = None
+    width: Optional[int] = None
+    height: Optional[int] = None
+    size: Optional[int] = None
+    #thumbnail: Optional[FileResize] = None
+    # medium: Optional[FileResize] = None
+    date_added: Optional[datetime] = None
+    date_modified: Optional[datetime] = None
+
+
 class UserProfileResponse(BaseModel):
-    first_name: Optional[str] = None
-    last_name: Optional[str] = None
-    address: Optional[str] = None
-    email: Optional[str] = None
-    phone_number: Optional[str] = None
-    birthday: datetime = None
-    full_phone_number:Optional[str] = None
+    user: User
+    storage: Optional[Storage] = None
+
+
 
 class UserDetail(User):
     uuid: str

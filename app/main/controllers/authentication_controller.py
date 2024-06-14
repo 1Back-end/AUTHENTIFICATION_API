@@ -13,7 +13,7 @@ from app.main.core.security import create_access_token, get_password_hash
 from app.main.core.config import Config
 from app.main.models import User
 from app.main.schemas.user import UserProfileResponse
-
+from app.main.services.storage_service import storage
 router = APIRouter(prefix="", tags=["authentication"])
 
 
@@ -259,15 +259,17 @@ async def update_user_profile(user_uuid: str,
                               address: Optional[str] = None,
                               phone_number: Optional[str] = None,
                               birthday: Optional[str] = None,
-                              # avatar: Optional[UploadFile] = File(None),
+                              storage_uuid: Optional[str] =None,
                               db: Session = Depends(get_db)):
     try:
+        
         # if avatar is not None and avatar.filename:
         #     avatar_file = FileUpload(file_name=avatar.filename, base_64=await avatar.read())
         # else:
         #     avatar_file = None
         user = crud.user.update_profile(
             db=db,
+            
             user_uuid=user_uuid,
             first_name=first_name,
             last_name=last_name,
