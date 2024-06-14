@@ -16,6 +16,7 @@ class ConfigClass(BaseSettings):
     ALGORITHM: str = get_secret("ALGORITHM", 'HS256')
 
     ADMIN_KEY: str = get_secret("ADMIN_KEY", "EpursaKey2024")
+    API_KEY: str = get_secret("API_KEY", "AMC25Gva6pTEouh60ZDfKCZxCHfHJn-x-WoYPpoGRWQ")
     ADMIN_USERNAME: str = get_secret("ADMIN_USERNAME", "epursa")
     ADMIN_PASSWORD: str = get_secret("ADMIN_PASSWORD", "q6lr0tZXiX")
 
@@ -41,6 +42,8 @@ class ConfigClass(BaseSettings):
 
     PROJECT_NAME: str = get_secret("PROJECT_NAME", "EPURSA AUTHENTICATION API")
     PROJECT_VERSION: str = get_secret("PROJECT_VERSION", "1.0.0")
+    # STORAGE_API_URL: str = get_secret("STORAGE_API_URL", "http://45.130.104.46:5008/api/v1/storage")
+    STORAGE_API_URL: str = get_secret("STORAGE_API_URL", "http://localhost:5307/api/v1/storage")
 
     REDIS_HOST: str = get_secret("REDIS_HOST", "localhost")  # redis_develop
     REDIS_PORT: int = get_secret("REDIS_PORT", 6379)
