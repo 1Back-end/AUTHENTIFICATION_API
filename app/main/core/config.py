@@ -16,7 +16,6 @@ class ConfigClass(BaseSettings):
     ALGORITHM: str = get_secret("ALGORITHM", 'HS256')
 
     ADMIN_KEY: str = get_secret("ADMIN_KEY", "EpursaKey2024")
-    API_KEY: str = get_secret("API_KEY", "D3EX3vpM3ntm3l9MOdJ")
     ADMIN_USERNAME: str = get_secret("ADMIN_USERNAME", "epursa")
     ADMIN_PASSWORD: str = get_secret("ADMIN_PASSWORD", "q6lr0tZXiX")
 
@@ -27,7 +26,6 @@ class ConfigClass(BaseSettings):
                                               'postgresql://postgres:postgres19J2140@localhost:5432'
                                               '/auth_epursa')
 
-
     SQLALCHEMY_POOL_SIZE: int = 100
     SQLALCHEMY_MAX_OVERFLOW: int = 0
     SQLALCHEMY_POOL_TIMEOUT: int = 30
@@ -36,15 +34,6 @@ class ConfigClass(BaseSettings):
         "pool_pre_ping": True,
         "pool_recycle": SQLALCHEMY_POOL_RECYCLE,
     }
-    
-    MINIO_API_URL: Optional[str] = get_secret("MINIO_API_URL", "http://45.130.104.46:5005/api/v1/transaction/storages"
-                                                               "/file/get/")
-    MINIO_URL: Optional[str] = get_secret("MINIO_URL", "45.130.104.46:9009")
-    MINIO_ACCESS_KEY: Optional[str] = get_secret("MINIO_ACCESS_KEY", "WlsCK$gS7CTqhmM@x0jshEzsCK$gTqSM@7CTdc3hTdc3mxlfyBo=")
-    MINIO_SECRET_KEY: Optional[str] = get_secret("MINIO_SECRET_KEY","jDe6SMqmmfCFyfGXD0n0N7r9AE2oKXyf/4pOht+GXDpLRRCF0n0N7r9AEqZfHoskTn1jjogcANAkflmfDa0kpxfiw==")
-    MINIO_BUCKET: str = get_secret("MINIO_BUCKET", "develop")
-    MINIO_SECURE: bool = False
-
 
     PREFERRED_LANGUAGE: str = get_secret("PREFERRED_LANGUAGE", 'fr')
 
