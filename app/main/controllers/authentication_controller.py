@@ -166,7 +166,7 @@ def logout_user(
     db.refresh(new_blacklist_token)
 
     # print("======current_user======", user_token)
-    return {'message': 'You have logged out successfully!'}
+    return {'message': 'You have logged out successZfully!'}
 
 
 @router.post("/start-reset-password", summary="Start reset password with phone number", response_model=schemas.Msg)
@@ -260,29 +260,12 @@ def get_current_user(
     return {"user":current_user,"avatar":exist_storage}
 
 
-@router.put("/users/{user_uuid}/profile", response_model=UserProfileResponse)
+@router.put("/users/profile", response_model=UserProfileResponse)
 async def update_user_profile(
-        user_uuid: str,
-        first_name: Optional[str] = None,
-        last_name: Optional[str] = None,
-        email: Optional[str] = None,
-        address: Optional[str] = None,
-        phone_number: Optional[str] = None,
-        birthday: Optional[str] = None,
-        storage_uuid: str = None,
+        user: schemas.UserUpdates,
         db: Session = Depends(get_db)):
     try:
-        user = crud.user.update_profile(
-            db=db,
-            user_uuid=user_uuid,
-            first_name=first_name,
-            last_name=last_name,
-            email=email,
-            address=address,
-            phone_number=phone_number,
-            birthday=birthday,
-            storage_uuid=storage_uuid
-        )
+        user = crud.user.update_profile(updated_user=user, db=db)
 
         return user
     except Exception as e:

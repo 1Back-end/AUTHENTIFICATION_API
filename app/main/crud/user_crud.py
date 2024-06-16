@@ -1,6 +1,6 @@
 import uuid
 from datetime import datetime, timedelta
-from typing import Union,Optional,List
+from typing import Union, Optional, List
 from app.main.core.i18n import __
 from requests import Session
 from app.main.crud.base import CRUDBase
@@ -11,6 +11,7 @@ from app.main.core.security import get_password_hash, verify_password, generate_
 from app.main import utils
 from fastapi import HTTPException
 from app.main.services.storage_service import storage
+
 
 class CRUDUser(CRUDBase[models.User, schemas.UserCreate, schemas.UserUpdate]):
 
@@ -65,59 +66,48 @@ class CRUDUser(CRUDBase[models.User, schemas.UserCreate, schemas.UserUpdate]):
             db.commit()
             cls.resend_otp(db=db, db_obj=db_obj)
             return db_obj
-       
 
     @classmethod
     def get_by_uuid(cls, db: Session, *, uuid: str) -> Union[models.User, None]:
         return db.query(models.User).filter(models.User.uuid == uuid).first()
 
-
     @classmethod
-    def update_profile(
-            cls,
-            db: Session,
-            user_uuid: str,
-            country_code: str = None,
-            first_name: Optional[str] = None,
-            last_name: Optional[str] = None,
-            email: Optional[str] = None,
-            address: Optional[str] = None,
-            phone_number: Optional[str] = None,
-            birthday: Optional[str] = None,
-            storage_uuid: str = None,
-    ):
+    def update_profile(cls, db: Session, updated_user: schemas.UserUpdates):
         exist_storage = None
 
-        user = db.query(User).filter(User.uuid == user_uuid).first()
+        user = db.query(User).filter(User.uuid == updated_user.user_uuid).first()
 
-        user.first_name = first_name if first_name else user.first_name
-        user.last_name = last_name if last_name else user.last_name
-        user.email = email if email else user.email
+        user.first_name = updated_user.first_name if updated_user.first_name else user.first_name
+        user.last_name = updated_user.last_name if updated_user.last_name else user.last_name
+        user.email = updated_user.email if updated_user.email else user.email
 
-        user.country = country_code if country_code else user.country_code
-        user.address =  address if address else user.address
-        user.phone_number = phone_number if phone_number else user.phone_number
+        user.country = updated_user.country_code if updated_user.country_code else user.country_code
+        user.address = updated_user.address if updated_user.address else user.address
+        user.phone_number = updated_user.phone_number if updated_user.phone_number else user.phone_number
 
-        user.birthday = birthday if birthday else user.birthday
-        user.full_phone_number=user.country_code + phone_number if phone_number else user.full_phone_number
+        user.birthday = updated_user.birthday if updated_user.birthday else user.birthday
+        user.full_phone_number = user.country_code + updated_user.phone_number if updated_user.phone_number else user.full_phone_number
         user.storage_uuid = None
-
-        if storage_uuid is not None:
-            storage_uuids =[storage_uuid]
+        print(f".....................new uuid:{updated_user.storage_uuid}")
+        print(f".....................new user:{user}")
+        if updated_user.storage_uuid:
+            storage_uuids = [updated_user.storage_uuid]
             exist_storage = storage.get_storages(storage_uuids=storage_uuids)
+            if not exist_storage:
+                raise HTTPException(status_code=404, detail="Storage uuid not found")
+            print(f".................... image: {exist_storage}")
             exist_storage = exist_storage[0]
 
-            print("===exist_storage123===",exist_storage)
+            print("===exist_storage123===", exist_storage)
             user.storage_uuid = exist_storage["uuid"] if exist_storage else user.storage_uuid
         db.commit()
         db.refresh(user)
-        return {"user" : user ,"avatar":exist_storage}
-        
+        return {"user": user, "avatar": exist_storage}
+
     # @staticmethod
     # def handle_file_upload(file: FileUpload) -> str:
     #
     #     pass
 
-        
 
 user = CRUDUser(models.User)
