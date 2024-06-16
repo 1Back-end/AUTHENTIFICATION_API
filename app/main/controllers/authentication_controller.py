@@ -14,6 +14,7 @@ from app.main.core.config import Config
 from app.main.models import User
 from app.main.schemas.user import UserProfileResponse
 from app.main.services.storage_service import storage
+
 router = APIRouter(prefix="", tags=["authentication"])
 
 
@@ -27,6 +28,9 @@ async def login_with_phone_number_password(
     """
     Sign in with phone number and password
     """
+    if len(country_code) >5:
+        raise HTTPException(status_code=400, detail="Phone number cannot be longer than 5 characters")
+
     user = crud.user.authenticate(
         db, phone_number=f"{country_code}{phone_number}", password=password
     )
@@ -240,7 +244,7 @@ def reset_password(
     return schemas.Msg(message=__("password-reset-successfully"))
 
 
-@router.get("/me", summary="Get current user", response_model=schemas.UserDetail)
+@router.get("/me", summary="Get current user", response_model=UserProfileResponse)
 def get_current_user(
         current_user: models.User = Depends(TokenRequired()),
         db: Session = Depends(get_db),
@@ -248,28 +252,28 @@ def get_current_user(
     """
     Get current user
     """
-    return current_user
+    exist_storage = None
+    if  current_user.storage_uuid is not None:
+        storage_uuids = [current_user.storage_uuid]
+        exist_storage = storage.get_storages(storage_uuids=storage_uuids)
+        exist_storage = exist_storage[0]
+    return {"user":current_user,"avatar":exist_storage}
 
 
 @router.put("/users/{user_uuid}/profile", response_model=UserProfileResponse)
-async def update_user_profile(user_uuid: str,
-                              first_name: Optional[str] = None,
-                              last_name: Optional[str] = None,
-                              email: Optional[str] = None,
-                              address: Optional[str] = None,
-                              phone_number: Optional[str] = None,
-                              birthday: Optional[str] = None,
-                              storage_uuid: str = None,
-                              db: Session = Depends(get_db)):
+async def update_user_profile(
+        user_uuid: str,
+        first_name: Optional[str] = None,
+        last_name: Optional[str] = None,
+        email: Optional[str] = None,
+        address: Optional[str] = None,
+        phone_number: Optional[str] = None,
+        birthday: Optional[str] = None,
+        storage_uuid: str = None,
+        db: Session = Depends(get_db)):
     try:
-        
-        # if avatar is not None and avatar.filename:
-        #     avatar_file = FileUpload(file_name=avatar.filename, base_64=await avatar.read())
-        # else:
-        #     avatar_file = None
         user = crud.user.update_profile(
             db=db,
-            
             user_uuid=user_uuid,
             first_name=first_name,
             last_name=last_name,
@@ -278,7 +282,6 @@ async def update_user_profile(user_uuid: str,
             phone_number=phone_number,
             birthday=birthday,
             storage_uuid=storage_uuid
-            # avatar_file=avatar_file
         )
 
         return user
