@@ -38,26 +38,33 @@ async def validate_token(
         db.close()
         return False
     db.close()
-    seller = user.get_by_uuid(db=db, uuid=user_uuid)
-    if not seller:
+    current_user = user.get_by_uuid(db=db, uuid=user_uuid)
+    if not current_user:
         raise HTTPException(status_code=404, detail="User not found")
-    return seller
+    return current_user
 
 
-@router.get("/get_buyer_uuid/{token}/{phone_number}", status_code=200)
-async def get_buyer_uuid(
+@router.get("/get_users/{token}/{uuid}", status_code=200)
+async def get_users(
         token: str,
-        phone_number: str,
+        uuid: str,
 ):
-    """Validate token"""
+    """Get users"""
     db = SessionLocal()
     if BlacklistToken.check_blacklist(db=db, auth_token=token):
         db.close()
         return False
     db.close()
-    buyer_uuid = user.get_by_phone_number(db=db, phone_number=phone_number)
-    if not buyer_uuid:
+    print(f"...........uuid come from front:{uuid}")
+    print(".............new format_buyer:{}, seller:{}".format(decode_access_token(token)['sub'], uuid))
+    users = []
+    user1 = user.get_by_uuid(db=db, uuid=decode_access_token(token)['sub'])
+    user2 = user.get_by_uuid(db=db, uuid=uuid)
+    if not user1:
         raise HTTPException(status_code=404, detail="User not found")
-    if buyer_uuid.uuid == decode_access_token(token)['sub']:
-        raise HTTPException(status_code=403, detail="You cannot use your number to create a buyer")
-    return buyer_uuid.uuid
+    users.append(user1)
+    if not user2:
+        raise HTTPException(status_code=404, detail="User not found")
+    users.append(user2)
+    print(".............buyer:{}, seller:{}".format(user1, user2))
+    return users
