@@ -165,7 +165,7 @@ def logout_user(
     print("=====blacklist token====", type(new_blacklist_token.date_added), type(new_blacklist_token.date_modified))
     db.refresh(new_blacklist_token)
 
-    print("======current_user======", user_token)
+    # print("======current_user======", user_token)
     return {'message': 'You have logged out successfully!'}
 
 
