@@ -9,7 +9,7 @@ from starlette.requests import Request
 from app.main.core.dependencies import get_db, TokenRequired
 from app.main import schemas, crud, models
 from app.main.core.i18n import __
-from app.main.core.security import create_access_token, get_password_hash
+from app.main.core.security import create_access_token, get_password_hash, decode_access_token
 from app.main.core.config import Config
 from app.main.models import User
 from app.main.schemas.user import UserProfileResponse
@@ -143,10 +143,11 @@ async def verify_otp(
     }
 
 
-@router.post("/logout")
+@router.post("/logout/{token}", summary="Logout", response_model=schemas.Msg)
 def logout_user(
         *,
         db: Session = Depends(get_db),
+        token: str,
         current_user: models.User = Depends(TokenRequired()),
         request: Request
 ) -> Any:
@@ -154,7 +155,7 @@ def logout_user(
         Logout a user
     """
 
-    user_token = (request.headers["authorization"]).split("Bearer")[1].strip()
+    user_token = decode_access_token(token)['sub']
 
     new_blacklist_token = models.BlacklistToken(
         uuid=str(uuid.uuid4()),
@@ -166,7 +167,7 @@ def logout_user(
     db.refresh(new_blacklist_token)
 
     print("======current_user======", user_token)
-    return {'message': 'You have logged out successfully!'}
+    return schemas.Msg(message='You have logged out successfully!')
 
 
 @router.post("/start-reset-password", summary="Start reset password with phone number", response_model=schemas.Msg)
