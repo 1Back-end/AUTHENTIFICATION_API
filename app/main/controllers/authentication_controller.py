@@ -2,8 +2,8 @@ import uuid
 from datetime import timedelta, datetime
 from typing import Any, Optional, List
 from fastapi import APIRouter, Depends, Body, HTTPException, Query, File
+from fastapi.encoders import jsonable_encoder
 from sqlalchemy.orm import Session
-import requests
 from starlette.requests import Request
 
 from app.main.core.dependencies import get_db, TokenRequired
@@ -11,7 +11,6 @@ from app.main import schemas, crud, models
 from app.main.core.i18n import __
 from app.main.core.security import create_access_token, get_password_hash
 from app.main.core.config import Config
-from app.main.models import User
 from app.main.schemas.user import UserProfileResponse
 from app.main.services.storage_service import storage
 
@@ -257,16 +256,18 @@ def get_current_user(
         storage_uuids = [current_user.storage_uuid]
         exist_storage = storage.get_storages(storage_uuids=storage_uuids)
         exist_storage = exist_storage[0]
-    return {"user":current_user,"avatar":exist_storage}
+        current_user = jsonable_encoder(current_user)
+
+        current_user["avatar"] = exist_storage
+    return current_user
 
 
 @router.put("/users/profile", response_model=UserProfileResponse)
 async def update_user_profile(
-        user: schemas.UserUpdates,
-        db: Session = Depends(get_db)):
-    try:
-        user = crud.user.update_profile(updated_user=user, db=db)
+        obj_in: schemas.UserUpdate,
+        db: Session = Depends(get_db)
+):
+    if not crud.user.get_by_uuid(db=db, uuid=obj_in.user_uuid):
+        raise HTTPException(status_code=404, detail="User not found")
 
-        return user
-    except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
+    return crud.user.update_profile(obj_in=obj_in, db=db)

@@ -31,15 +31,18 @@ class Storage(BaseModel):
     width: Optional[int] = None
     height: Optional[int] = None
     size: Optional[int] = None
-    thumbnail: Any
-    medium: Any
+    thumbnail: Any = None
+    medium: Any = None
     date_added: Optional[datetime] = None
     date_modified: Optional[datetime] = None
 
 
-class UserProfileResponse(BaseModel):
-    user: User
-    avatar: Optional[Storage]
+class UserProfileResponse(UserBase):
+    uuid: Optional[str] = None
+    date_added: datetime
+    date_modified: datetime
+    avatar: Optional[Storage] = None
+
 
 
 class UserDetail(User):
@@ -71,9 +74,9 @@ class UserAuthentication(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 
-class UserUpdates(BaseModel):
+class UserUpdate(BaseModel):
     user_uuid: str
-    country_code: str
+    country_code: Optional[str] = None
     first_name: Optional[str] = None
     last_name: Optional[str] = None
     email: Optional[str] = None
