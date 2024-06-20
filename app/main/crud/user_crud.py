@@ -1,8 +1,11 @@
 import uuid
 from datetime import datetime, timedelta
 from typing import Union, Optional, List
+
+from fastapi.encoders import jsonable_encoder
+from pydantic_core import to_json
+
 from app.main.core.i18n import __
-from requests import Session
 from app.main.crud.base import CRUDBase
 from sqlalchemy.orm import Session
 from app.main.models import User
@@ -72,42 +75,41 @@ class CRUDUser(CRUDBase[models.User, schemas.UserCreate, schemas.UserUpdate]):
         return db.query(models.User).filter(models.User.uuid == uuid).first()
 
     @classmethod
-    def update_profile(cls, db: Session, updated_user: schemas.UserUpdates):
+    def update_profile(cls, db: Session, obj_in: schemas.UserUpdate):
         exist_storage = None
 
-        user = db.query(User).filter(User.uuid == updated_user.user_uuid).first()
+        user = db.query(User).filter(User.uuid == obj_in.user_uuid).first()
+        if user:
+            print("===user====",user)
+            user.first_name = obj_in.first_name if obj_in.first_name else user.first_name
+            user.last_name = obj_in.last_name if obj_in.last_name else user.last_name
+            user.email = obj_in.email if obj_in.email else user.email
 
-        user.first_name = updated_user.first_name if updated_user.first_name else user.first_name
-        user.last_name = updated_user.last_name if updated_user.last_name else user.last_name
-        user.email = updated_user.email if updated_user.email else user.email
+            user.country = obj_in.country_code if obj_in.country_code else user.country_code
+            user.address = obj_in.address if obj_in.address else user.address
+            user.phone_number = obj_in.phone_number if obj_in.phone_number else user.phone_number
 
-        user.country = updated_user.country_code if updated_user.country_code else user.country_code
-        user.address = updated_user.address if updated_user.address else user.address
-        user.phone_number = updated_user.phone_number if updated_user.phone_number else user.phone_number
+            user.birthday = obj_in.birthday if obj_in.birthday else user.birthday
+            user.full_phone_number = user.country_code + obj_in.phone_number if obj_in.phone_number else user.full_phone_number
+            user.storage_uuid = None
+            print(f".....................new uuid:{obj_in.storage_uuid}")
+            print(f".....................new user:{user}")
+            if obj_in.storage_uuid:
+                storage_uuids = [obj_in.storage_uuid]
+                exist_storage = storage.get_storages(storage_uuids=storage_uuids)
 
-        user.birthday = updated_user.birthday if updated_user.birthday else user.birthday
-        user.full_phone_number = user.country_code + updated_user.phone_number if updated_user.phone_number else user.full_phone_number
-        user.storage_uuid = None
-        print(f".....................new uuid:{updated_user.storage_uuid}")
-        print(f".....................new user:{user}")
-        if updated_user.storage_uuid:
-            storage_uuids = [updated_user.storage_uuid]
-            exist_storage = storage.get_storages(storage_uuids=storage_uuids)
-            if not exist_storage:
-                raise HTTPException(status_code=404, detail="Storage uuid not found")
-            print(f".................... image: {exist_storage}")
-            exist_storage = exist_storage[0]
+                exist_storage = exist_storage[0] if exist_storage else None
 
-            print("===exist_storage123===", exist_storage)
-            user.storage_uuid = exist_storage["uuid"] if exist_storage else user.storage_uuid
-        db.commit()
-        db.refresh(user)
-        return {"user": user, "avatar": exist_storage}
+                user.storage_uuid = exist_storage["uuid"] if exist_storage else user.storage_uuid
 
-    # @staticmethod
-    # def handle_file_upload(file: FileUpload) -> str:
-    #
-    #     pass
+                db.commit()
+                db.refresh(user)
+                user = jsonable_encoder(user)
+
+                user["avatar"] = exist_storage
+
+            return user
+
 
 
 user = CRUDUser(models.User)
