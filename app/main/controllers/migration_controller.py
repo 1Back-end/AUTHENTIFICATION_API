@@ -51,7 +51,7 @@ async def create_database_tables(
     try:
         shutil.rmtree(migrations_folder)
     except Exception as e:
-        pass
+        print(f"====Error:",e)
 
     """ create alembic versions folder content """
     try:
@@ -65,7 +65,7 @@ async def create_database_tables(
         # Get the environment system
         if platform.system() == 'Windows':
 
-            os.system('set PYTHONPATH=. && .\\.venv\Scripts\python.exe -m alembic revision --autogenerate')
+            os.system('set PYTHONPATH=. && .\\venv\Scripts\python.exe -m alembic revision --autogenerate')
 
         else:
             os.system('PYTHONPATH=. alembic revision --autogenerate')
@@ -73,7 +73,7 @@ async def create_database_tables(
         # Get the environment system
         if platform.system() == 'Windows':
 
-            os.system('set PYTHONPATH=. && .\\.venv\Scripts\python.exe -m alembic upgrade head')
+            os.system('set PYTHONPATH=. && .\\venv\Scripts\python.exe -m alembic upgrade head')
 
         else:
             os.system('PYTHONPATH=. alembic upgrade head')
